@@ -92,19 +92,26 @@ class TableController extends Controller
 
         return view('tables.places', ['places' => $places]);
     }
-    //shows edit page
-// Shows the edit page for a specific place
     public function showPlace($id)
     {
-        // Raw SQL query to get the specific place details by joining the tables
         $place = DB::select(
-            'SELECT lv.id, lv.darbo_laikas, lv.įėjimo_mokestis, lv.reitingas, lv.tipas,
-                mt.valstybė, mt.miestas, mt.pavadinimas, mt.adresas, mt.trukmė, lv.fk_MARŠRUTO_TAŠKAS
+            'SELECT
+            lv.id AS lv_id, lv.darbo_laikas, lv.įėjimo_mokestis, lv.reitingas, lv.tipas,
+            mt.valstybė, mt.miestas, mt.pavadinimas, mt.adresas, mt.trukmė, mt.id AS fk_MARŠRUTO_TAŠKAS,
+            uz.užsakymo_numeris, uz.pasirašymo_data, uz.nutraukimo_data, uz.trukmė AS užsakymo_trukmė, uz.žmonių_sk,
+            kel.pradžia, kel.pabaiga, kel.būsena, kel.id AS fk_KELIONĖ
          FROM lankytinos_vietos lv
          JOIN maršruto_taškai mt ON lv.fk_MARŠRUTO_TAŠKAS = mt.id
+         JOIN užsakymai uz ON uz.fk_KELIONĖ = mt.fk_KELIONĖ
+         JOIN kelionės kel ON uz.fk_KELIONĖ = kel.id
          WHERE lv.id = ?',
             [$id]
         );
+
+        // Check if the place exists
+        if (empty($place)) {
+            abort(404, 'Įrašas nerastas.');
+        }
 
         // Pass the first result to the view
         return view('tables.edit', ['place' => $place[0]]);
@@ -122,8 +129,11 @@ class TableController extends Controller
             'pavadinimas'       => 'required|string|max:100',
             'adresas'           => 'required|string|max:100',
             'trukmė'            => 'required|integer',
+            'užsakymo_numeris'  => 'nullable|integer',
+            'nutraukimo_data'   => 'nullable|date',
         ]);
 
+        // Update MARŠRUTO_TAŠKAI table
         DB::update(
             'UPDATE maršruto_taškai
          SET valstybė = ?, miestas = ?, pavadinimas = ?, adresas = ?, trukmė = ?
@@ -138,6 +148,7 @@ class TableController extends Controller
             ]
         );
 
+        // Update LANKYTINOS_VIETOS table
         DB::update(
             'UPDATE lankytinos_vietos
          SET darbo_laikas = ?, įėjimo_mokestis = ?, reitingas = ?, tipas = ?
@@ -148,6 +159,34 @@ class TableController extends Controller
                 $request->reitingas,
                 $request->tipas,
                 $id,
+            ]
+        );
+
+        // Update UŽSAKYMAI table if provided
+        if ($request->has('užsakymo_numeris')) {
+            DB::update(
+                'UPDATE užsakymai
+             SET trukmė = ?, žmonių_sk = ?, nutraukimo_data = ?
+             WHERE užsakymo_numeris = ?',
+                [
+                    $request->trukmė,
+                    $request->žmonių_sk,
+                    $request->nutraukimo_data,
+                    $request->užsakymo_numeris,
+                ]
+            );
+        }
+
+        // Update KELIONĖS table
+        DB::update(
+            'UPDATE kelionės
+         SET pradžia = ?, pabaiga = ?, būsena = ?
+         WHERE id = ?',
+            [
+                $request->pradžia,
+                $request->pabaiga,
+                $request->būsena,
+                $request->fk_KELIONĖ,
             ]
         );
 
