@@ -8,7 +8,6 @@
             'lankytinos_vietos' => 'Lankytinų vietų sąrašas.',
             'maršruto_taškai' => 'Peržiūrėti maršrutų taškų sąrašą ir informaciją.',
             'užsakymai' => 'Peržiūrėti klientų užsakymų informaciją.',
-            'viešbučiai' => 'Peržiūrėti viešbučių duomenis ir kontaktus.'
         ];
 
         $icons = [
@@ -16,7 +15,6 @@
             'lankytinos_vietos' => 'bi bi-geo-alt-fill',
             'maršruto_taškai' => 'bi bi-signpost-2-fill',
             'užsakymai' => 'bi bi-file-earmark-text-fill',
-            'viešbučiai' => 'bi bi-building-check'
         ];
     @endphp
     <div class="top-bar-wrapper">

@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class TableController extends Controller
@@ -9,7 +10,7 @@ class TableController extends Controller
     {
         // Include only these tables
         $includedTables = [
-            'užsakymai', 'kelionės', 'lankytinos_vietos', 'maršruto_taškai', 'viešbučiai',
+            'užsakymai', 'kelionės', 'lankytinos_vietos', 'maršruto_taškai',
         ];
 
         return view('tables.index', ['tableNames' => $includedTables]);
@@ -59,17 +60,7 @@ class TableController extends Controller
                 'pavadinimas' => 'Pavadinimas',
                 'adresas' => 'Adresas'
             ];
-        } else if ($name === 'viešbučiai') {
-            $records = DB::select("
-            SELECT kaina_nakčiai, reitingas, svečių_sk, tel_nr
-            FROM viešbučiai
-        ");
-            $headers = [
-                'kaina_nakčiai' => 'Kaina nakčiai',
-                'reitingas' => 'Reitingas',
-                'svečių_sk' => 'Svečių skaičius',
-                'tel_nr' => 'Telefono numeris'
-            ];
+
         } else {
             $records = DB::select("SELECT * FROM `$name`");
             $headers = null;
@@ -93,15 +84,108 @@ class TableController extends Controller
             mt.valstybė,
             mt.miestas,
             mt.pavadinimas AS taško_pavadinimas,
-            mt.adresas
+            mt.adresas,
+            lv.id
         FROM lankytinos_vietos lv
         JOIN maršruto_taškai mt ON lv.fk_MARŠRUTO_TAŠKAS = mt.id
     ");
 
         return view('tables.places', ['places' => $places]);
     }
+    //shows edit page
+// Shows the edit page for a specific place
+    public function showPlace($id)
+    {
+        // Raw SQL query to get the specific place details by joining the tables
+        $place = DB::select(
+            'SELECT lv.id, lv.darbo_laikas, lv.įėjimo_mokestis, lv.reitingas, lv.tipas,
+                mt.valstybė, mt.miestas, mt.pavadinimas, mt.adresas, mt.trukmė, lv.fk_MARŠRUTO_TAŠKAS
+         FROM lankytinos_vietos lv
+         JOIN maršruto_taškai mt ON lv.fk_MARŠRUTO_TAŠKAS = mt.id
+         WHERE lv.id = ?',
+            [$id]
+        );
 
+        // Pass the first result to the view
+        return view('tables.edit', ['place' => $place[0]]);
+    }
 
+    public function updatePlace(Request $request, $id)
+    {
+        $request->validate([
+            'darbo_laikas'      => 'required|string|max:20',
+            'įėjimo_mokestis'   => 'required|integer',
+            'reitingas'         => 'required|integer',
+            'tipas'             => 'required|string',
+            'valstybė'          => 'required|string|max:50',
+            'miestas'           => 'required|string|max:50',
+            'pavadinimas'       => 'required|string|max:100',
+            'adresas'           => 'required|string|max:100',
+            'trukmė'            => 'required|integer',
+        ]);
 
+        DB::update(
+            'UPDATE maršruto_taškai
+         SET valstybė = ?, miestas = ?, pavadinimas = ?, adresas = ?, trukmė = ?
+         WHERE id = ?',
+            [
+                $request->valstybė,
+                $request->miestas,
+                $request->pavadinimas,
+                $request->adresas,
+                $request->trukmė,
+                $request->fk_MARŠRUTO_TAŠKAS,
+            ]
+        );
+
+        DB::update(
+            'UPDATE lankytinos_vietos
+         SET darbo_laikas = ?, įėjimo_mokestis = ?, reitingas = ?, tipas = ?
+         WHERE id = ?',
+            [
+                $request->darbo_laikas,
+                $request->įėjimo_mokestis,
+                $request->reitingas,
+                $request->tipas,
+                $id,
+            ]
+        );
+
+        // Redirect back with a success message
+        return redirect()->route('places');
+    }
+
+    public function destroy($id)
+    {
+        // Get the foreign key reference from LANKYTINOS_VIETOS table (fk_MARŠRUTO_TAŠKAS)
+        $routePointId = DB::select(
+            'SELECT fk_MARŠRUTO_TAŠKAS FROM lankytinos_vietos WHERE id = ?',
+            [$id]
+        );
+
+        // Check if the record exists
+        if (empty($routePointId)) {
+            abort(404, 'Įrašas nerastas.');
+        }
+
+        // Delete the record from the LANKYTINOS_VIETOS table
+        DB::delete(
+            'DELETE FROM lankytinos_vietos WHERE id = ?',
+            [$id]
+        );
+
+        // Delete the associated record from the MARŠRUTO_TAŠKAI table
+        DB::delete(
+            'DELETE FROM maršruto_taškai WHERE id = ?',
+            [$routePointId[0]->fk_MARŠRUTO_TAŠKAS]
+        );
+
+        // Redirect back with a success message
+        return redirect()->route('places')->with('success', 'Įrašas sėkmingai ištrintas.');
+    }
+
+    public function createPlace(){
+
+    }
 }
 
