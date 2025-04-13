@@ -146,7 +146,7 @@
                                                 <div class="border-top pt-3 uzsakymas-container">
                                                     <input type="hidden"
                                                            name="keliones[{{ $index }}][užsakymai][{{ $uzsakymoIndex }}][id]"
-                                                           value="{{ $uzsakymas->id ?? '' }}">
+                                                           value="{{ $uzsakymas->užsakymo_numeris ?? '' }}">
                                                     <input type="hidden" name="keliones[{{ $index }}][užsakymai][{{ $uzsakymoIndex }}][method]" value="update" />
                                                     <div class="row g-3">
                                                         <div class="col-md-4">
@@ -283,15 +283,13 @@
 
             $(document).on('click', '.delete-uzsakymas-btn', function() {
                 $(this).closest('.uzsakymas-container').hide();
-                $(this).closest('.uzsakymas-container').querySelector('input[name$="[method]"]').value = 'delete';
+                $(this).closest('.uzsakymas-container').children()[1] .value = 'delete';
 
             });
 
             $(document).on('click', '.delete-kelione-btn', function() {
                 $(this).closest('.kelione-container').hide();
-                $(this).closest('.kelione-container').querySelector('input[name$="[method]"]').value = 'delete';
-
-
+                $(this).closest('.kelione-container').children()[1] .value = 'delete';
             });
 
         });

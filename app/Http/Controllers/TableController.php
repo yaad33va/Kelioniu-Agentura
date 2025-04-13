@@ -153,16 +153,20 @@ class TableController extends Controller
             'adresas' => 'required|string|max:100',
             'trukmė' => 'required|integer',
             'kelionės' => 'nullable|array',
-            'kelionės.*.id' => 'nullable|integer',
-            'kelionės.*.pradžia' => 'nullable|date',
-            'kelionės.*.pabaiga' => 'nullable|date',
-            'kelionės.*.būsena' => 'nullable|string',
+            'kelionės.*.id' => 'integer',
+            'kelionės.*.pradžia' => 'date',
+            'kelionės.*.pabaiga' => 'date',
+            'kelionės.*.būsena' => 'string',
+            'kelionės.*.method' => 'string',
             'kelionės.*.užsakymai' => 'nullable|array',
             'kelionės.*.užsakymai.*.id' => 'nullable|integer',
             'kelionės.*.užsakymai.*.trukmė' => 'required|integer',
             'kelionės.*.užsakymai.*.žmonių_sk' => 'required|integer',
-            'kelionės.*.užsakymai.*.nutraukimo_data' => 'nullable|date',
+            'kelionės.*.užsakymai.*.nutraukimo_data' => 'date',
+            'kelionės.*.užsakymai.*.method' => 'string',
         ]);
+
+        debug($request->all());
 
         // Atnaujinami MARŠRUTO_TAŠKAI ir LANKYTINOS_VIETOS įrašai
         DB::update(
@@ -191,8 +195,9 @@ class TableController extends Controller
         // Tvarkomi Kelionės ir Užsakymai naudojant gryną SQL
         if ($request->has('keliones')) {
             foreach ($request->keliones as $kelioneData) {
+                debug('kelioneData', $kelioneData);
                 if (isset($kelioneData['id'])) {
-                    if (isset($kelioneData['_destroy']) && $kelioneData['_destroy'] == 1) {
+                    if ($kelioneData['method'] === "delete") {
                         // Ištrinama esama Kelionė
                         DB::delete('DELETE FROM kelionės WHERE id = ?', [$kelioneData['id']]);
                         continue; // Pereiname prie kitos kelionės
@@ -209,7 +214,7 @@ class TableController extends Controller
                         ]
                     );
                     $kelioneId = $kelioneData['id']; // Naudojamas esamas ID Užsakymams
-                } else if (!isset($kelioneData['_destroy'])) {
+                } else if ($kelioneData['method'] === 'new') {
                     // Sukuriama nauja Kelionė
                     DB::insert(
                         'INSERT INTO kelionės (pradžia, pabaiga, būsena) VALUES (?, ?, ?)',
@@ -228,15 +233,15 @@ class TableController extends Controller
                 if (isset($kelioneData['užsakymai'])) {
                     foreach ($kelioneData['užsakymai'] as $uzsakymasData) {
                         if (isset($uzsakymasData['id'])) {
-                            if (isset($uzsakymasData['_destroy']) && $uzsakymasData['_destroy'] == 1) {
+                            if ($uzsakymasData['method'] === 'delete') {
                                 // Ištrinamas esamas Užsakymas
-                                DB::delete('DELETE FROM užsakymai WHERE id = ?', [$uzsakymasData['id']]);
+                                DB::delete('DELETE FROM užsakymai WHERE užsakymo_numeris = ?', [$uzsakymasData['id']]);
                                 continue; // Pereiname prie kito užsakymo
                             }
 
                             // Atnaujinamas esamas Užsakymas
                             DB::update(
-                                'UPDATE užsakymai SET trukmė = ?, žmonių_sk = ?, nutraukimo_data = ? WHERE id = ?',
+                                'UPDATE užsakymai SET trukmė = ?, žmonių_sk = ?, nutraukimo_data = ? WHERE užsakymo_numeris = ?',
                                 [
                                     $uzsakymasData['trukmė'],
                                     $uzsakymasData['žmonių_sk'],
@@ -244,7 +249,7 @@ class TableController extends Controller
                                     $uzsakymasData['id'],
                                 ]
                             );
-                        } else if (!isset($uzsakymasData['_destroy'])){
+                        } else if ($uzsakymasData['method'] === 'new') {
                             // Sukuriamas naujas Užsakymas ir susiejamas su Kelione
                             DB::insert(
                                 'INSERT INTO užsakymai (trukmė, žmonių_sk, nutraukimo_data, fk_KELIONĖ) VALUES (?, ?, ?, ?)',
@@ -255,8 +260,6 @@ class TableController extends Controller
                                     $kelioneId, // Naudojamas Kelionės ID
                                 ]
                             );
-                        } else {
-                            continue;
                         }
                     }
                 }
