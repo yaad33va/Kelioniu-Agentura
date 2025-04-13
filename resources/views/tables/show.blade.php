@@ -23,15 +23,6 @@
                                     // Default formatting
                                     $formatted = $value;
 
-                                    // Format if value looks like a datetime
-                                    if (strtotime($value) !== false && str_contains($value, ':')) {
-                                        try {
-                                            $formatted = \Carbon\Carbon::parse($value)->format('Y-m-d');
-                                        } catch (\Exception $e) {
-                                            $formatted = $value;
-                                        }
-                                    }
-
                                     // Custom formatting for 'tipas'
                                     if (strtolower($key) === 'tipas') {
                                         $formatted = str_replace('_', ' ', $formatted);

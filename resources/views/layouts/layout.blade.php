@@ -12,7 +12,7 @@
 
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color: #F0F0F0;
         }
 
         .pastel-card {

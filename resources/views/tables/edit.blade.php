@@ -16,115 +16,135 @@
         <h1 class="mb-4 fw-bold">Valdyti Įrašus</h1>
 
         <form action="{{ route('places.update', $place->lv_id) }}" method="POST">
-            @method('POST')
             @csrf
+            @method('PUT')
 
             {{-- MARŠRUTO TAŠKAI --}}
             <div class="card pastel-card pastel-bg-1 mb-4">
-                <h4 class="mb-3">Maršruto Taškai</h4>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Valstybė</label>
-                        <input type="text" name="valstybė" value="{{ $place->valstybė ?? '' }}" class="form-control">
+                <div class="card-body">
+                    <h4 class="card-title mb-3">Maršruto Taškai</h4>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="valstybė" class="form-label">Valstybė</label>
+                            <input type="text" name="valstybė" id="valstybė" value="{{ old('valstybė', $place->valstybė ?? '') }}" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="miestas" class="form-label">Miestas</label>
+                            <input type="text" name="miestas" id="miestas" value="{{ old('miestas', $place->miestas ?? '') }}" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="pavadinimas" class="form-label">Pavadinimas</label>
+                            <input type="text" name="pavadinimas" id="pavadinimas" value="{{ old('pavadinimas', $place->pavadinimas ?? '') }}" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="adresas" class="form-label">Adresas</label>
+                            <input type="text" name="adresas" id="adresas" value="{{ old('adresas', $place->adresas ?? '') }}" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="trukmė" class="form-label">Trukmė</label>
+                            <input type="number" name="trukmė" id="trukmė" value="{{ old('trukmė', $place->trukmė ?? '') }}" class="form-control">
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Miestas</label>
-                        <input type="text" name="miestas" value="{{ $place->miestas ?? '' }}" class="form-control">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Pavadinimas</label>
-                        <input type="text" name="pavadinimas" value="{{ $place->pavadinimas ?? '' }}" class="form-control">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Adresas</label>
-                        <input type="text" name="adresas" value="{{ $place->adresas ?? '' }}" class="form-control">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Trukmė</label>
-                        <input type="number" name="trukmė" value="{{ $place->trukmė ?? '' }}" class="form-control">
-                    </div>
+                    <input type="hidden" name="fk_MARŠRUTO_TAŠKAS" value="{{ $place->fk_MARŠRUTO_TAŠKAS }}">
                 </div>
             </div>
 
             {{-- LANKYTINOS VIETOS --}}
             <div class="card pastel-card pastel-bg-2 mb-4">
-                <h4 class="mb-3">Lankytinos Vietos</h4>
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label">Darbo laikas</label>
-                        <input type="text" name="darbo_laikas" value="{{ $place->darbo_laikas ?? '' }}" class="form-control">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Įėjimo mokestis</label>
-                        <input type="number" name="įėjimo_mokestis" value="{{ $place->įėjimo_mokestis ?? '' }}" class="form-control">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Reitingas</label>
-                        <input type="number" name="reitingas" value="{{ $place->reitingas ?? '' }}" class="form-control">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Tipas</label>
-                        <select name="tipas" class="form-select">
-                            @php
-                                $tipai = ['SPA_centras', 'parkas', 'baseinas', 'restoranas', 'kurortas', 'pramogu_centras', 'muziejus'];
-                            @endphp
-                            @foreach ($tipai as $tipas)
-                                <option value="{{ $tipas }}" {{ (isset($place->tipas) && $place->tipas === $tipas) ? 'selected' : '' }}>
-                                    {{ ucfirst(str_replace('_', ' ', $tipas)) }}
-                                </option>
-                            @endforeach
-                        </select>
+                <div class="card-body">
+                    <h4 class="card-title mb-3">Lankytinos Vietos</h4>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="darbo_laikas" class="form-label">Darbo laikas</label>
+                            <input type="text" name="darbo_laikas" id="darbo_laikas" value="{{ old('darbo_laikas', $place->darbo_laikas ?? '') }}" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="įėjimo_mokestis" class="form-label">Įėjimo mokestis</label>
+                            <input type="number" name="įėjimo_mokestis" id="įėjimo_mokestis" value="{{ old('įėjimo_mokestis', $place->įėjimo_mokestis ?? '') }}" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="reitingas" class="form-label">Reitingas</label>
+                            <input type="number" name="reitingas" id="reitingas" value="{{ old('reitingas', $place->reitingas ?? '') }}" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="tipas" class="form-label">Tipas</label>
+                            <select name="tipas" id="tipas" class="form-select">
+                                @php
+                                    $tipai = ['SPA_centras', 'parkas', 'baseinas', 'restoranas', 'kurortas', 'pramogu_centras', 'muziejus'];
+                                @endphp
+                                @foreach ($tipai as $tipas)
+                                    <option value="{{ $tipas }}" {{ old('tipas', $place->tipas ?? '') === $tipas ? 'selected' : '' }}>
+                                        {{ ucfirst(str_replace('_', ' ', $tipas)) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {{-- KELIONĖS IR UŽSAKYMAI --}}
-            <div class="card pastel-card pastel-bg-3 mb-4">
-                <h4 class="mb-3">Kelionės ir Užsakymai</h4>
-                <div id="combined-section" class="row g-4">
-                    @if(!empty($combinedEntries))
-                        @foreach($combinedEntries as $index => $entry)
-                            <div class="border-top pt-3">
-                                <input type="hidden" name="combined[{{ $index }}][id]" value="{{ $entry->id }}">
-                                <div class="row g-3">
-                                    @php
-                                        $fields = [
-                                            'pradžia' => 'Pradžia',
-                                            'pabaiga' => 'Pabaiga',
-                                            'būsena' => 'Būsena',
-                                            'trukmė' => 'Trukmė',
-                                            'žmonių_sk' => 'Žmonių Skaičius',
-                                            'nutraukimo_data' => 'Nutraukimo Data'
-                                        ];
-                                    @endphp
-
-                                    @foreach($fields as $field => $label)
+            {{-- KELIONĖS ir UŽSAKYMAI --}}
+            <div class="card pastel-card pastel-bg-4 mb-4">
+                <div class="card-body">
+                    <h4 class="card-title mb-3">Kelionės ir Užsakymai</h4>
+                    <div id="keliones-uzsakymai-section" class="row g-4">
+                        @if(!empty($keliones))
+                            @foreach($keliones as $index => $kelione)
+                                <div class="border-top pt-3 kelione-container">
+                                    <input type="hidden" name="keliones[{{ $index }}][id]" value="{{ $kelione->id ?? '' }}">
+                                    <div class="row g-3 mb-3">
                                         <div class="col-md-4">
-                                            <label class="form-label">{{ $label }}</label>
-                                            @if($field === 'būsena')
-                                                <select name="combined[{{ $index }}][{{ $field }}]" class="form-select">
-                                                    <option value="planuojama" {{ $entry->$field === 'planuojama' ? 'selected' : '' }}>Planuojama</option>
-                                                    <option value="vykdoma" {{ $entry->$field === 'vykdoma' ? 'selected' : '' }}>Vykdoma</option>
-                                                    <option value="baigta" {{ $entry->$field === 'baigta' ? 'selected' : '' }}>Baigta</option>
-                                                </select>
-                                            @else
-                                                <input
-                                                    type="{{ in_array($field, ['pradžia', 'pabaiga', 'nutraukimo_data']) ? 'datetime-local' : 'number' }}"
-                                                    name="combined[{{ $index }}][{{ $field }}]"
-                                                    value="{{ $entry->$field }}"
-                                                    class="form-control"
-                                                >
-                                            @endif
+                                            <label for="pradžia-{{ $index }}" class="form-label">Pradžia</label>
+                                            <input type="date" name="keliones[{{ $index }}][pradžia]" id="pradžia-{{ $index }}" value="{{ old('keliones.' . $index . '.pradžia', $kelione->pradžia ?? '') }}" class="form-control">
                                         </div>
-                                    @endforeach
+                                        <div class="col-md-4">
+                                            <label for="pabaiga-{{ $index }}" class="form-label">Pabaiga</label>
+                                            <input type="date" name="keliones[{{ $index }}][pabaiga]" id="pabaiga-{{ $index }}" value="{{ old('keliones.' . $index . '.pabaiga', $kelione->pabaiga ?? '') }}" class="form-control">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="būsena-{{ $index }}" class="form-label">Būsena</label>
+                                            <select name="keliones[{{ $index }}][būsena]" id="būsena-{{ $index }}" class="form-select">
+                                                <option value="planuojama" {{ old('keliones.' . $index . '.būsena', $kelione->būsena ?? '') === 'planuojama' ? 'selected' : '' }}>Planuojama</option>
+                                                <option value="vykdoma" {{ old('keliones.' . $index . '.būsena', $kelione->būsena ?? '') === 'vykdoma' ? 'selected' : '' }}>Vykdoma</option>
+                                                <option value="baigta" {{ old('keliones.' . $index . '.būsena', $kelione->būsena ?? '') === 'baigta' ? 'selected' : '' }}>Baigta</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <h5 class="mb-2">Užsakymai:</h5>
+                                    <div id="uzsakymai-section-{{$index}}" class="row g-4">
+                                        @if(!empty($kelione->užsakymai))
+                                            @foreach($kelione->užsakymai as $uzsakymoIndex => $uzsakymas)
+                                                <div class="border-top pt-3 uzsakymas-container">
+                                                    <input type="hidden" name="keliones[{{ $index }}][užsakymai][{{$uzsakymoIndex}}][id]" value="{{ $uzsakymas->id ?? '' }}">
+                                                    <div class="row g-3">
+                                                        <div class="col-md-4">
+                                                            <label for="trukmė-{{ $index }}-{{ $uzsakymoIndex }}" class="form-label">Trukmė</label>
+                                                            <input type="number" name="keliones[{{ $index }}][užsakymai][{{$uzsakymoIndex}}][trukmė]" id="trukmė-{{ $index }}-{{ $uzsakymoIndex }}" value="{{ old('keliones.' . $index . '.užsakymai.' . $uzsakymoIndex . '.trukmė', $uzsakymas->trukmė ?? '') }}" class="form-control">
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <label for="žmonių_sk-{{ $index }}-{{ $uzsakymoIndex }}" class="form-label">Žmonių Skaičius</label>
+                                                            <input type="number" name="keliones[{{ $index }}][užsakymai][{{$uzsakymoIndex}}][žmonių_sk]" id="žmonių_sk-{{ $index }}-{{ $uzsakymoIndex }}" value="{{ old('keliones.' . $index . '.užsakymai.' . $uzsakymoIndex . '.žmonių_sk', $uzsakymas->žmonių_sk ?? '') }}" class="form-control">
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <label for="nutraukimo_data-{{ $index }}-{{ $uzsakymoIndex }}" class="form-label">Nutraukimo Data</label>
+                                                            <input type="date" name="keliones[{{ $index }}][užsakymai][{{$uzsakymoIndex}}][nutraukimo_data]" id="nutraukimo_data-{{ $index }}-{{ $uzsakymoIndex }}" value="{{ old('keliones.' . $index . '.užsakymai.' . $uzsakymoIndex . '.nutraukimo_data', $uzsakymas->nutraukimo_data ?? '') }}" class="form-control">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @endif
+                                    </div>
+                                    <button type="button" class="btn btn-outline-primary mt-3 add-uzsakymas-btn" data-kelione-index="{{$index}}">
+                                        <i class="bi bi-plus-circle me-2"></i>Pridėti Užsakymą
+                                    </button>
                                 </div>
-                            </div>
-                        @endforeach
-                    @endif
+                            @endforeach
+                        @endif
+                    </div>
+                    <button type="button" id="add-kelione" class="btn btn-outline-primary mt-3">
+                        <i class="bi bi-plus-circle me-2"></i>Pridėti Kelionę
+                    </button>
                 </div>
-                <button type="button" id="add-combined-entry" class="btn btn-outline-primary mt-3">
-                    <i class="bi bi-plus-circle me-2"></i>Pridėti Kelionę ir Užsakymą
-                </button>
             </div>
 
             <div class="text-end">
@@ -133,48 +153,73 @@
         </form>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        let combinedIndex = {{ count($combinedEntries ?? []) }};
+        $(document).ready(function() {
+            let kelioneIndex = {{ count($keliones ?? []) }};
 
-        document.getElementById('add-combined-entry').addEventListener('click', () => {
-            const section = document.getElementById('combined-section');
-            const div = document.createElement('div');
-            div.classList.add('border-top', 'pt-3');
+            document.getElementById('add-kelione').addEventListener('click', () => {
+                const section = document.getElementById('keliones-uzsakymai-section');
+                const newKelioneIndex = kelioneIndex;
+                const div = document.createElement('div');
+                div.className = 'border-top pt-3 kelione-container';
+                div.innerHTML = `
+                    <input type="hidden" name="keliones[${newKelioneIndex}][id]" value="">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label for="pradžia-${newKelioneIndex}" class="form-label">Pradžia</label>
+                            <input type="date" name="keliones[${newKelioneIndex}][pradžia]" id="pradžia-${newKelioneIndex}" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="pabaiga-${newKelioneIndex}" class="form-label">Pabaiga</label>
+                            <input type="date" name="keliones[${newKelioneIndex}][pabaiga]" id="pabaiga-${newKelioneIndex}" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="būsena-${newKelioneIndex}" class="form-label">Būsena</label>
+                            <select name="keliones[${newKelioneIndex}][būsena]" id="būsena-${newKelioneIndex}" class="form-select">
+                                <option value="planuojama">Planuojama</option>
+                                <option value="vykdoma">Vykdoma</option>
+                                <option value="baigta">Baigta</option>
+                            </select>
+                        </div>
+                    </div>
+                    <h5 class="mb-2">Užsakymai:</h5>
+                    <div id="uzsakymai-section-${newKelioneIndex}" class="row g-4">
+                    </div>
+                    <button type="button" class="btn btn-outline-primary mt-3 add-uzsakymas-btn" data-kelione-index="${newKelioneIndex}">
+                        <i class="bi bi-plus-circle me-2"></i>Pridėti Užsakymą
+                    </button>
+                `;
+                section.appendChild(div);
 
-            div.innerHTML = `
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label">Pradžia</label>
-                    <input type="date" name="combined[${combinedIndex}][pradžia]" class="form-control">
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Pabaiga</label>
-                    <input type="date" name="combined[${combinedIndex}][pabaiga]" class="form-control">
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Būsena</label>
-                    <select name="combined[${combinedIndex}][būsena]" class="form-select">
-                        <option value="planuojama">Planuojama</option>
-                        <option value="vykdoma">Vykdoma</option>
-                        <option value="baigta">Baigta</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Trukmė</label>
-                    <input type="number" name="combined[${combinedIndex}][trukmė]" class="form-control">
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Žmonių Skaičius</label>
-                    <input type="number" name="combined[${combinedIndex}][žmonių_sk]" class="form-control">
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Nutraukimo Data</label>
-                    <input type="date" name="combined[${combinedIndex}][nutraukimo_data]" class="form-control">
-                </div>
-            </div>
-        `;
-            section.appendChild(div);
-            combinedIndex++;
+                kelioneIndex++;
+            });
+
+            $(document).on('click', '.add-uzsakymas-btn', function() {
+                const kelioneIndex = $(this).data('kelione-index');
+                const section = document.getElementById(`uzsakymai-section-${kelioneIndex}`);
+                const uzsakymasIndex = section.querySelectorAll('.uzsakymas-container').length;
+                const div = document.createElement('div');
+                div.className = 'border-top pt-3 uzsakymas-container';
+                div.innerHTML = `
+                    <input type="hidden" name="keliones[${kelioneIndex}][užsakymai][${uzsakymasIndex}][id]" value="">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="trukmė-${kelioneIndex}-${uzsakymasIndex}" class="form-label">Trukmė</label>
+                            <input type="number" name="keliones[${kelioneIndex}][užsakymai][${uzsakymasIndex}][trukmė]" id="trukmė-${kelioneIndex}-${uzsakymasIndex}" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="žmonių_sk-${kelioneIndex}-${uzsakymasIndex}" class="form-label">Žmonių Skaičius</label>
+                            <input type="number" name="keliones[${kelioneIndex}][užsakymai][${uzsakymasIndex}][žmonių_sk]" id="žmonių_sk-${kelioneIndex}-${uzsakymasIndex}" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="nutraukimo_data-${kelioneIndex}-${uzsakymasIndex}" class="form-label">Nutraukimo Data</label>
+                            <input type="date" name="keliones[${kelioneIndex}][užsakymai][${uzsakymasIndex}][nutraukimo_data]" id="nutraukimo_data-${kelioneIndex}-${uzsakymasIndex}" class="form-control">
+                        </div>
+                    </div>
+                `;
+                section.appendChild(div);
+            });
         });
     </script>
 @endsection
