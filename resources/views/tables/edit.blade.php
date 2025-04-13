@@ -26,23 +26,28 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label for="valstybė" class="form-label">Valstybė</label>
-                            <input type="text" name="valstybė" id="valstybė" value="{{ old('valstybė', $place->valstybė ?? '') }}" class="form-control">
+                            <input type="text" name="valstybė" id="valstybė"
+                                   value="{{ old('valstybė', $place->valstybė ?? '') }}" class="form-control">
                         </div>
                         <div class="col-md-6">
                             <label for="miestas" class="form-label">Miestas</label>
-                            <input type="text" name="miestas" id="miestas" value="{{ old('miestas', $place->miestas ?? '') }}" class="form-control">
+                            <input type="text" name="miestas" id="miestas"
+                                   value="{{ old('miestas', $place->miestas ?? '') }}" class="form-control">
                         </div>
                         <div class="col-md-6">
                             <label for="pavadinimas" class="form-label">Pavadinimas</label>
-                            <input type="text" name="pavadinimas" id="pavadinimas" value="{{ old('pavadinimas', $place->pavadinimas ?? '') }}" class="form-control">
+                            <input type="text" name="pavadinimas" id="pavadinimas"
+                                   value="{{ old('pavadinimas', $place->pavadinimas ?? '') }}" class="form-control">
                         </div>
                         <div class="col-md-6">
                             <label for="adresas" class="form-label">Adresas</label>
-                            <input type="text" name="adresas" id="adresas" value="{{ old('adresas', $place->adresas ?? '') }}" class="form-control">
+                            <input type="text" name="adresas" id="adresas"
+                                   value="{{ old('adresas', $place->adresas ?? '') }}" class="form-control">
                         </div>
                         <div class="col-md-4">
                             <label for="trukmė" class="form-label">Trukmė</label>
-                            <input type="number" name="trukmė" id="trukmė" value="{{ old('trukmė', $place->trukmė ?? '') }}" class="form-control">
+                            <input type="number" name="trukmė" id="trukmė"
+                                   value="{{ old('trukmė', $place->trukmė ?? '') }}" class="form-control">
                         </div>
                     </div>
                     <input type="hidden" name="fk_MARŠRUTO_TAŠKAS" value="{{ $place->fk_MARŠRUTO_TAŠKAS }}">
@@ -56,15 +61,18 @@
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label for="darbo_laikas" class="form-label">Darbo laikas</label>
-                            <input type="text" name="darbo_laikas" id="darbo_laikas" value="{{ old('darbo_laikas', $place->darbo_laikas ?? '') }}" class="form-control">
+                            <input type="text" name="darbo_laikas" id="darbo_laikas"
+                                   value="{{ old('darbo_laikas', $place->darbo_laikas ?? '') }}" class="form-control">
                         </div>
                         <div class="col-md-4">
                             <label for="įėjimo_mokestis" class="form-label">Įėjimo mokestis</label>
-                            <input type="number" name="įėjimo_mokestis" id="įėjimo_mokestis" value="{{ old('įėjimo_mokestis', $place->įėjimo_mokestis ?? '') }}" class="form-control">
+                            <input type="number" name="įėjimo_mokestis" id="įėjimo_mokestis"
+                                   value="{{ old('įėjimo_mokestis', $place->įėjimo_mokestis ?? '') }}" class="form-control">
                         </div>
                         <div class="col-md-4">
                             <label for="reitingas" class="form-label">Reitingas</label>
-                            <input type="number" name="reitingas" id="reitingas" value="{{ old('reitingas', $place->reitingas ?? '') }}" class="form-control">
+                            <input type="number" name="reitingas" id="reitingas"
+                                   value="{{ old('reitingas', $place->reitingas ?? '') }}" class="form-control">
                         </div>
                         <div class="col-md-6">
                             <label for="tipas" class="form-label">Tipas</label>
@@ -73,7 +81,8 @@
                                     $tipai = ['SPA_centras', 'parkas', 'baseinas', 'restoranas', 'kurortas', 'pramogu_centras', 'muziejus'];
                                 @endphp
                                 @foreach ($tipai as $tipas)
-                                    <option value="{{ $tipas }}" {{ old('tipas', $place->tipas ?? '') === $tipas ? 'selected' : '' }}>
+                                    <option value="{{ $tipas }}"
+                                        {{ old('tipas', $place->tipas ?? '') === $tipas ? 'selected' : '' }}>
                                         {{ ucfirst(str_replace('_', ' ', $tipas)) }}
                                     </option>
                                 @endforeach
@@ -88,53 +97,96 @@
                 <div class="card-body">
                     <h4 class="card-title mb-3">Kelionės ir Užsakymai</h4>
                     <div id="keliones-uzsakymai-section" class="row g-4">
-                        @if(!empty($keliones))
-                            @foreach($keliones as $index => $kelione)
+                        @if (!empty($keliones))
+                            @foreach ($keliones as $index => $kelione)
                                 <div class="border-top pt-3 kelione-container">
                                     <input type="hidden" name="keliones[{{ $index }}][id]" value="{{ $kelione->id ?? '' }}">
-                                    <div class="row g-3 mb-3">
+                                    <input type="hidden" name="keliones[{{ $index }}][method]" value="update" />
+                                    <div class="row g-3 mb-3 align-items-center">
                                         <div class="col-md-4">
                                             <label for="pradžia-{{ $index }}" class="form-label">Pradžia</label>
-                                            <input type="date" name="keliones[{{ $index }}][pradžia]" id="pradžia-{{ $index }}" value="{{ old('keliones.' . $index . '.pradžia', $kelione->pradžia ?? '') }}" class="form-control">
+                                            <input type="date" name="keliones[{{ $index }}][pradžia]"
+                                                   id="pradžia-{{ $index }}"
+                                                   value="{{ old('keliones.' . $index . '.pradžia', $kelione->pradžia ?? '') }}"
+                                                   class="form-control">
                                         </div>
                                         <div class="col-md-4">
                                             <label for="pabaiga-{{ $index }}" class="form-label">Pabaiga</label>
-                                            <input type="date" name="keliones[{{ $index }}][pabaiga]" id="pabaiga-{{ $index }}" value="{{ old('keliones.' . $index . '.pabaiga', $kelione->pabaiga ?? '') }}" class="form-control">
+                                            <input type="date" name="keliones[{{ $index }}][pabaiga]"
+                                                   id="pabaiga-{{ $index }}"
+                                                   value="{{ old('keliones.' . $index . '.pabaiga', $kelione->pabaiga ?? '') }}"
+                                                   class="form-control">
                                         </div>
                                         <div class="col-md-4">
                                             <label for="būsena-{{ $index }}" class="form-label">Būsena</label>
-                                            <select name="keliones[{{ $index }}][būsena]" id="būsena-{{ $index }}" class="form-select">
-                                                <option value="planuojama" {{ old('keliones.' . $index . '.būsena', $kelione->būsena ?? '') === 'planuojama' ? 'selected' : '' }}>Planuojama</option>
-                                                <option value="vykdoma" {{ old('keliones.' . $index . '.būsena', $kelione->būsena ?? '') === 'vykdoma' ? 'selected' : '' }}>Vykdoma</option>
-                                                <option value="baigta" {{ old('keliones.' . $index . '.būsena', $kelione->būsena ?? '') === 'baigta' ? 'selected' : '' }}>Baigta</option>
+                                            <select name="keliones[{{ $index }}][būsena]"
+                                                    id="būsena-{{ $index }}" class="form-select">
+                                                <option value="planuojama"
+                                                    {{ old('keliones.' . $index . '.būsena', $kelione->būsena ?? '') === 'planuojama' ? 'selected' : '' }}>
+                                                    Planuojama</option>
+                                                <option value="vykdoma"
+                                                    {{ old('keliones.' . $index . '.būsena', $kelione->būsena ?? '') === 'vykdoma' ? 'selected' : '' }}>
+                                                    Vykdoma</option>
+                                                <option value="baigta"
+                                                    {{ old('keliones.' . $index . '.būsena', $kelione->būsena ?? '') === 'baigta' ? 'selected' : '' }}>
+                                                    Baigta</option>
                                             </select>
                                         </div>
                                     </div>
+                                    <div class="row g-3 mb-3 align-items-center">
+                                        <div class="col-md-12">
+                                            <button type="button" class="btn btn-danger btn-sm delete-kelione-btn"
+                                                    data-kelione-index="{{ $index }}">Ištrinti kelionę</button>
+                                        </div>
+                                    </div>
                                     <h5 class="mb-2">Užsakymai:</h5>
-                                    <div id="uzsakymai-section-{{$index}}" class="row g-4">
-                                        @if(!empty($kelione->užsakymai))
-                                            @foreach($kelione->užsakymai as $uzsakymoIndex => $uzsakymas)
+                                    <div id="uzsakymai-section-{{ $index }}" class="row g-4">
+                                        @if (!empty($kelione->užsakymai))
+                                            @foreach ($kelione->užsakymai as $uzsakymoIndex => $uzsakymas)
                                                 <div class="border-top pt-3 uzsakymas-container">
-                                                    <input type="hidden" name="keliones[{{ $index }}][užsakymai][{{$uzsakymoIndex}}][id]" value="{{ $uzsakymas->id ?? '' }}">
+                                                    <input type="hidden"
+                                                           name="keliones[{{ $index }}][užsakymai][{{ $uzsakymoIndex }}][id]"
+                                                           value="{{ $uzsakymas->id ?? '' }}">
+                                                    <input type="hidden" name="keliones[{{ $index }}][užsakymai][{{ $uzsakymoIndex }}][method]" value="update" />
                                                     <div class="row g-3">
                                                         <div class="col-md-4">
-                                                            <label for="trukmė-{{ $index }}-{{ $uzsakymoIndex }}" class="form-label">Trukmė</label>
-                                                            <input type="number" name="keliones[{{ $index }}][užsakymai][{{$uzsakymoIndex}}][trukmė]" id="trukmė-{{ $index }}-{{ $uzsakymoIndex }}" value="{{ old('keliones.' . $index . '.užsakymai.' . $uzsakymoIndex . '.trukmė', $uzsakymas->trukmė ?? '') }}" class="form-control">
+                                                            <label for="trukmė-{{ $index }}-{{ $uzsakymoIndex }}"
+                                                                   class="form-label">Trukmė</label>
+                                                            <input type="number"
+                                                                   name="keliones[{{ $index }}][užsakymai][{{ $uzsakymoIndex }}][trukmė]"
+                                                                   id="trukmė-{{ $index }}-{{ $uzsakymoIndex }}"
+                                                                   class="form-control"
+                                                                   value="{{ old('keliones.' . $index . '.užsakymai.' . $uzsakymoIndex . '.trukmė', $uzsakymas->trukmė ?? '') }}">
                                                         </div>
                                                         <div class="col-md-4">
-                                                            <label for="žmonių_sk-{{ $index }}-{{ $uzsakymoIndex }}" class="form-label">Žmonių Skaičius</label>
-                                                            <input type="number" name="keliones[{{ $index }}][užsakymai][{{$uzsakymoIndex}}][žmonių_sk]" id="žmonių_sk-{{ $index }}-{{ $uzsakymoIndex }}" value="{{ old('keliones.' . $index . '.užsakymai.' . $uzsakymoIndex . '.žmonių_sk', $uzsakymas->žmonių_sk ?? '') }}" class="form-control">
+                                                            <label for="žmonių_sk-{{ $index }}-{{ $uzsakymoIndex }}"
+                                                                   class="form-label">Žmonių Skaičius</label>
+                                                            <input type="number"
+                                                                   name="keliones[{{ $index }}][užsakymai][{{ $uzsakymoIndex }}][žmonių_sk]"
+                                                                   id="žmonių_sk-{{ $index }}-{{ $uzsakymoIndex }}"
+                                                                   class="form-control"
+                                                                   value="{{ old('keliones.' . $index . '.užsakymai.' . $uzsakymoIndex . '.žmonių_sk', $uzsakymas->žmonių_sk ?? '') }}">
                                                         </div>
                                                         <div class="col-md-4">
-                                                            <label for="nutraukimo_data-{{ $index }}-{{ $uzsakymoIndex }}" class="form-label">Nutraukimo Data</label>
-                                                            <input type="date" name="keliones[{{ $index }}][užsakymai][{{$uzsakymoIndex}}][nutraukimo_data]" id="nutraukimo_data-{{ $index }}-{{ $uzsakymoIndex }}" value="{{ old('keliones.' . $index . '.užsakymai.' . $uzsakymoIndex . '.nutraukimo_data', $uzsakymas->nutraukimo_data ?? '') }}" class="form-control">
+                                                            <label for="nutraukimo_data-{{ $index }}-{{ $uzsakymoIndex }}"
+                                                                   class="form-label">Nutraukimo Data</label>
+                                                            <input type="date"
+                                                                   name="keliones[{{ $index }}][užsakymai][{{ $uzsakymoIndex }}][nutraukimo_data]"
+                                                                   id="nutraukimo_data-{{ $index }}-{{ $uzsakymoIndex }}"
+                                                                   class="form-control"
+                                                                   value="{{ old('keliones.' . $index . '.užsakymai.' . $uzsakymoIndex . '.nutraukimo_data', $uzsakymas->nutraukimo_data ?? '') }}">
                                                         </div>
                                                     </div>
+                                                    <button type="button"
+                                                            class="btn btn-danger btn-sm mt-2 delete-uzsakymas-btn"
+                                                            data-kelione-index="{{ $index }}"
+                                                            data-uzsakymas-index="{{ $uzsakymoIndex }}">Ištrinti Užsakymą</button>
                                                 </div>
                                             @endforeach
                                         @endif
                                     </div>
-                                    <button type="button" class="btn btn-outline-primary mt-3 add-uzsakymas-btn" data-kelione-index="{{$index}}">
+                                    <button type="button" class="btn btn-outline-primary mt-3 add-uzsakymas-btn"
+                                            data-kelione-index="{{ $index }}">
                                         <i class="bi bi-plus-circle me-2"></i>Pridėti Užsakymą
                                     </button>
                                 </div>
@@ -165,7 +217,8 @@
                 div.className = 'border-top pt-3 kelione-container';
                 div.innerHTML = `
                     <input type="hidden" name="keliones[${newKelioneIndex}][id]" value="">
-                    <div class="row g-3 mb-3">
+                    <input type="hidden" name="keliones[${newKelioneIndex}][method]" value="new" />
+                    <div class="row g-3 mb-3 align-items-center">
                         <div class="col-md-4">
                             <label for="pradžia-${newKelioneIndex}" class="form-label">Pradžia</label>
                             <input type="date" name="keliones[${newKelioneIndex}][pradžia]" id="pradžia-${newKelioneIndex}" class="form-control">
@@ -181,6 +234,11 @@
                                 <option value="vykdoma">Vykdoma</option>
                                 <option value="baigta">Baigta</option>
                             </select>
+                        </div>
+                    </div>
+                    <div class="row g-3 mb-3 align-items-center">
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-danger btn-sm delete-kelione-btn" data-kelione-index="${newKelioneIndex}">Ištrinti kelionę</button>
                         </div>
                     </div>
                     <h5 class="mb-2">Užsakymai:</h5>
@@ -203,6 +261,7 @@
                 div.className = 'border-top pt-3 uzsakymas-container';
                 div.innerHTML = `
                     <input type="hidden" name="keliones[${kelioneIndex}][užsakymai][${uzsakymasIndex}][id]" value="">
+                    <input type="hidden" name="keliones[${kelioneIndex}][užsakymai][${uzsakymasIndex}][method]" value="new" />
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label for="trukmė-${kelioneIndex}-${uzsakymasIndex}" class="form-label">Trukmė</label>
@@ -217,9 +276,24 @@
                             <input type="date" name="keliones[${kelioneIndex}][užsakymai][${uzsakymasIndex}][nutraukimo_data]" id="nutraukimo_data-${kelioneIndex}-${uzsakymasIndex}" class="form-control">
                         </div>
                     </div>
+                    <button type="button" class="btn btn-danger btn-sm mt-2 delete-uzsakymas-btn" data-kelione-index="${kelioneIndex}" data-uzsakymas-index="${uzsakymasIndex}">Ištrinti Užsakymą</button>
                 `;
                 section.appendChild(div);
             });
+
+            $(document).on('click', '.delete-uzsakymas-btn', function() {
+                $(this).closest('.uzsakymas-container').hide();
+                $(this).closest('.uzsakymas-container').querySelector('input[name$="[method]"]').value = 'delete';
+
+            });
+
+            $(document).on('click', '.delete-kelione-btn', function() {
+                $(this).closest('.kelione-container').hide();
+                $(this).closest('.kelione-container').querySelector('input[name$="[method]"]').value = 'delete';
+
+
+            });
+
         });
     </script>
 @endsection

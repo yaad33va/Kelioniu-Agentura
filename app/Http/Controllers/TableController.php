@@ -97,29 +97,49 @@ class TableController extends Controller
     }
     public function showPlace($id)
     {
-        $place = DB::select(
-            'SELECT
-            lv.id AS lv_id, lv.darbo_laikas, lv.įėjimo_mokestis, lv.reitingas, lv.tipas,
-            mt.valstybė, mt.miestas, mt.pavadinimas, mt.adresas, mt.trukmė, mt.id AS fk_MARŠRUTO_TAŠKAS,
-            uz.užsakymo_numeris, uz.pasirašymo_data, uz.nutraukimo_data, uz.trukmė AS užsakymo_trukmė, uz.žmonių_sk,
-            kel.pradžia, kel.pabaiga, kel.būsena, kel.id AS fk_KELIONĖ
-         FROM lankytinos_vietos lv
-         JOIN maršruto_taškai mt ON lv.fk_MARŠRUTO_TAŠKAS = mt.id
-         JOIN užsakymai uz ON uz.fk_KELIONĖ = mt.fk_KELIONĖ
-         JOIN kelionės kel ON uz.fk_KELIONĖ = kel.id
-         WHERE lv.id = ?',
-            [$id]
-        );
+        // Gauti vietos duomenis
+        $place = DB::select("
+            SELECT
+                lv.id AS lv_id,
+                lv.darbo_laikas,
+                lv.įėjimo_mokestis,
+                lv.reitingas,
+                lv.tipas,
+                mt.valstybė,
+                mt.miestas,
+                mt.pavadinimas,
+                mt.adresas,
+                mt.trukmė,
+                mt.id AS fk_MARŠRUTO_TAŠKAS
+            FROM lankytinos_vietos lv
+            JOIN maršruto_taškai mt ON lv.fk_MARŠRUTO_TAŠKAS = mt.id
+            WHERE lv.id = ?
+        ", [$id]);
 
-        // Check if the place exists
         if (empty($place)) {
             abort(404, 'Įrašas nerastas.');
         }
 
-        // Pass the first result to the view
-        return view('tables.edit', ['place' => $place[0]]);
-    }
+        // Gauti keliones, susijusias su vieta per užsakymus
+        $keliones = DB::select("
+            SELECT DISTINCT k.*
+            FROM kelionės k
+            JOIN užsakymai u ON k.id = u.fk_KELIONĖ
+            JOIN maršruto_taškai mt ON u.fk_KELIONĖ = mt.fk_KELIONĖ
+            WHERE mt.id = ?
+        ", [$place[0]->fk_MARŠRUTO_TAŠKAS]);
 
+        // Gauti užsakymus kiekvienai kelionei
+        foreach ($keliones as $kelione) {
+            $kelione->užsakymai = DB::select("
+                SELECT u.*
+                FROM užsakymai u
+                WHERE u.fk_KELIONĖ = ?
+            ", [$kelione->id]);
+        }
+
+        return view('tables.edit', ['place' => $place[0], 'keliones' => $keliones]);
+    }
     public function updatePlace(Request $request, $id)
     {
         $request->validate([
@@ -171,7 +191,13 @@ class TableController extends Controller
         // Tvarkomi Kelionės ir Užsakymai naudojant gryną SQL
         if ($request->has('keliones')) {
             foreach ($request->keliones as $kelioneData) {
-                if (!empty($kelioneData['id'])) {
+                if (isset($kelioneData['id'])) {
+                    if (isset($kelioneData['_destroy']) && $kelioneData['_destroy'] == 1) {
+                        // Ištrinama esama Kelionė
+                        DB::delete('DELETE FROM kelionės WHERE id = ?', [$kelioneData['id']]);
+                        continue; // Pereiname prie kitos kelionės
+                    }
+
                     // Atnaujinama esama Kelionė
                     DB::update(
                         'UPDATE kelionės SET pradžia = ?, pabaiga = ?, būsena = ? WHERE id = ?',
@@ -183,7 +209,7 @@ class TableController extends Controller
                         ]
                     );
                     $kelioneId = $kelioneData['id']; // Naudojamas esamas ID Užsakymams
-                } else {
+                } else if (!isset($kelioneData['_destroy'])) {
                     // Sukuriama nauja Kelionė
                     DB::insert(
                         'INSERT INTO kelionės (pradžia, pabaiga, būsena) VALUES (?, ?, ?)',
@@ -194,12 +220,20 @@ class TableController extends Controller
                         ]
                     );
                     $kelioneId = DB::getPdo()->lastInsertId(); // Gaunamas naujos Kelionės ID
+                } else {
+                    continue;
                 }
 
                 // Tvarkomi Užsakymai šiai Kelionei
                 if (isset($kelioneData['užsakymai'])) {
                     foreach ($kelioneData['užsakymai'] as $uzsakymasData) {
-                        if (!empty($uzsakymasData['id'])) {
+                        if (isset($uzsakymasData['id'])) {
+                            if (isset($uzsakymasData['_destroy']) && $uzsakymasData['_destroy'] == 1) {
+                                // Ištrinamas esamas Užsakymas
+                                DB::delete('DELETE FROM užsakymai WHERE id = ?', [$uzsakymasData['id']]);
+                                continue; // Pereiname prie kito užsakymo
+                            }
+
                             // Atnaujinamas esamas Užsakymas
                             DB::update(
                                 'UPDATE užsakymai SET trukmė = ?, žmonių_sk = ?, nutraukimo_data = ? WHERE id = ?',
@@ -210,7 +244,7 @@ class TableController extends Controller
                                     $uzsakymasData['id'],
                                 ]
                             );
-                        } else {
+                        } else if (!isset($uzsakymasData['_destroy'])){
                             // Sukuriamas naujas Užsakymas ir susiejamas su Kelione
                             DB::insert(
                                 'INSERT INTO užsakymai (trukmė, žmonių_sk, nutraukimo_data, fk_KELIONĖ) VALUES (?, ?, ?, ?)',
@@ -221,6 +255,8 @@ class TableController extends Controller
                                     $kelioneId, // Naudojamas Kelionės ID
                                 ]
                             );
+                        } else {
+                            continue;
                         }
                     }
                 }
