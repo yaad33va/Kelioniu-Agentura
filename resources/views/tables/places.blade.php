@@ -4,56 +4,51 @@
         <div class="d-flex justify-content-end align-items-center mb-4">
             <a href="{{ route('home') }}" class="btn btn-outline-primary">Grįžti į lentelių sąrašą</a>
         </div>
+        <h1 class="mb-4">Maršrutai</h1>
         <table class="table custom-table text-center">
             <thead>
             <tr>
-                <th>Įrašo numeris</th>
-                <th>Valstybė</th>
-                <th>Miestas</th>
-                <th>Taško pavadinimas</th>
-                <th>Adresas</th>
-                <th>Darbo laikas</th>
-                <th>Įėjimo mokestis</th>
-                <th>Reitingas</th>
-                <th>Tipas</th>
-                <th>Ištrinti</th>
-                <th>Redaguoti</th>
+                <th>Eilės numeris</th>
+                <th>Pradžia</th>
+                <th>Pabaiga</th>
+                <th>Trukmė</th>
+                <th>Žmonių skaičius</th>
+                <th>Kelionės pradžia</th>
+                <th>Kelionės pabaiga</th>
+                <th>Būsena</th>
+                <th>Redaguoti</th> <!-- New column for edit button -->
+                <th>Veiksmai</th> <!-- Column for delete button -->
             </tr>
             </thead>
             <tbody>
             @foreach($places as $place)
                 <tr>
-                    <td>{{ array_search($place, $places) + 1 }}</td>
-                    <td>{{ $place->valstybė }}</td>
-                    <td>{{ $place->miestas }}</td>
-                    <td>{{ $place->taško_pavadinimas }}</td>
-                    <td>{{ $place->adresas }}</td>
-                    <td>{{ $place->darbo_laikas }}</td>
-                    <td>{{ $place->įėjimo_mokestis }}</td>
-                    <td>{{ $place->reitingas }}</td>
-                    <td>{{ ucfirst(str_replace('_', ' ', $place->tipas)) }}</td>
+                    <td>{{ $loop->iteration }}</td> <!-- Use $loop->iteration for row numbers -->
+                    <td>{{ $place->start_date }}</td>
+                    <td>{{ $place->end_date }}</td>
+                    <td>{{ $place->duration ?? 'N/A' }}</td>
+                    <td>{{ $place->people_count ?? 'N/A' }}</td>
+                    <td>{{ $place->trip_start_date }}</td>
+                    <td>{{ $place->trip_end_date }}</td>
+                    <td>{{ $place->status }}</td>
                     <td>
-                        <form action="{{ route('places.destroy', $place->id) }}" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">Ištrinti įrašą</button>
-                        </form>
+                        <!-- Edit button -->
+                        <a href="{{ route('places.edit', $place->record_id) }}" class="btn btn-primary btn-sm">Redaguoti įrašą</a>
                     </td>
                     <td>
-                        <form action="{{ route('places.showPlace', $place->id) }}" method="GET">
+                        <!-- Delete button form -->
+                        <form action="{{ route('places.destroy', $place->record_id) }}" method="POST" onsubmit="return confirm('Ar tikrai norite ištrinti šį įrašą?');">
                             @csrf
-                            @method('GET')
-                            <button type="submit" class="btn btn-primary btn-sm">Redaguoti įrašą</button>
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm">Ištrinti</button>
                         </form>
                     </td>
                 </tr>
             @endforeach
             </tbody>
         </table>
-        <form action="{{ route('places.createPlace') }}" method="GET">
-            @csrf
-            @method('GET')
-            <button type="submit" class="btn btn-outline-primary btn-sm">Pridėti įrašus</button>
-        </form>
+        <div class="d-flex justify-content-end">
+            <a href="{{ route('home') }}" class="btn btn-outline-primary">Grįžti</a>
+        </div>
     </div>
 @endsection
