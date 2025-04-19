@@ -11,6 +11,7 @@
             @csrf
             @method('PUT')
 
+            <!-- Main form fields -->
             <div class="form-group mb-3">
                 <label for="start_date">Pasirašymo data</label>
                 <input type="date" class="form-control" id="start_date" name="start_date"
@@ -38,166 +39,92 @@
             <div class="form-group mb-3">
                 <label for="trip_start_date">Kelionės pradžia</label>
                 <input type="date" class="form-control" id="trip_start_date" name="trip_start_date"
-                       value="{{ old('trip_start_date', \Carbon\Carbon::parse($place->pradžia)->format('Y-m-d') ?? '') }}" required>
+                       value="{{ old('trip_start_date', $place->pradžia ?? '') }}" required>
             </div>
 
             <div class="form-group mb-3">
                 <label for="trip_end_date">Kelionės pabaiga</label>
                 <input type="date" class="form-control" id="trip_end_date" name="trip_end_date"
-                       value="{{ old('trip_end_date', $place->pabaiga ? \Carbon\Carbon::parse($place->pabaiga)->format('Y-m-d') : '') }}">
+                       value="{{ old('trip_end_date', $place->pabaiga ?? '') }}">
             </div>
 
             <div class="form-group mb-3">
                 <label for="trip_status">Būsena</label>
                 <select class="form-control" id="trip_status" name="trip_status" required>
-                    <option value="vykdoma" {{ old('trip_status', $place->būsena ?? '') == 'vykdoma' ? 'selected' : '' }}>Vykdoma</option>
-                    <option value="planuojama" {{ old('trip_status', $place->būsena ?? '') == 'planuojama' ? 'selected' : '' }}>Planuojama</option>
-                    <option value="baigta" {{ old('trip_status', $place->būsena ?? '') == 'baigta' ? 'selected' : '' }}>Baigta</option>
+                    <option value="vykdoma" {{ old('trip_status', $place->būsena) == 'vykdoma' ? 'selected' : '' }}>Vykdoma</option>
+                    <option value="planuojama" {{ old('trip_status', $place->būsena) == 'planuojama' ? 'selected' : '' }}>Planuojama</option>
+                    <option value="baigta" {{ old('trip_status', $place->būsena) == 'baigta' ? 'selected' : '' }}>Baigta</option>
                 </select>
             </div>
 
             <h3 class="mt-4">Maršruto Taškai ir Lankytinos Vietos</h3>
             <div id="dynamic-rows">
-                @if(isset($routePoints) && count($routePoints) > 0)
-                    @foreach($routePoints as $index => $routePoint)
-                        <div class="row align-items-end mb-3 dynamic-row">
-                            <div class="col-md-6">
-                                <input type="hidden" name="route_point_id[]" value="{{ $routePoint->id }}">
-                                <div class="form-group mb-3">
-                                    <label for="country[]">Valstybė</label>
-                                    <input type="text" class="form-control" name="country[]"
-                                           value="{{ old('country.' . $index, $routePoint->valstybė ?? '') }}">
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="city[]">Miestas</label>
-                                    <input type="text" class="form-control" name="city[]"
-                                           value="{{ old('city.' . $index, $routePoint->miestas ?? '') }}">
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="name[]">Pavadinimas</label>
-                                    <input type="text" class="form-control" name="name[]"
-                                           value="{{ old('name.' . $index, $routePoint->pavadinimas ?? '') }}">
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="address[]">Adresas</label>
-                                    <input type="text" class="form-control" name="address[]"
-                                           value="{{ old('address.' . $index, $routePoint->adresas ?? '') }}">
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="route_duration[]">Trukmė (valandos)</label>
-                                    <input type="number" class="form-control" name="route_duration[]"
-                                           value="{{ old('route_duration.' . $index, $routePoint->trukmė ?? '') }}">
-                                </div>
-                            </div>
+                @foreach($routePoints as $index => $point)
+                    <div class="dynamic-row border rounded p-3 mb-3">
+                        <input type="hidden" name="route_point_id[]" value="{{ $point->id }}">
+                        <input type="hidden" name="landmark_id[]" value="{{ $landmarks[$index]->id ?? '' }}">
 
-                            <div class="col-md-6">
-                                @php
-                                    $landmarkForRoutePoint = null;
-                                    foreach ($landmarks as $landmark) {
-                                        if ($landmark->fk_MARŠRUTO_TAŠKAS == $routePoint->id) {
-                                            $landmarkForRoutePoint = $landmark;
-                                            break;
-                                        }
-                                    }
-                                @endphp
-                                <input type="hidden" name="landmark_id[]" value="{{ $landmarkForRoutePoint->id ?? '' }}">
-                                <div class="form-group mb-3">
-                                    <label for="working_hours[]">Darbo Laikas</label>
-                                    <input type="text" class="form-control" name="working_hours[]"
-                                           value="{{ old('working_hours.' . $index, $landmarkForRoutePoint->darbo_laikas ?? '') }}">
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="entry_fee[]">Įėjimo Mokestis</label>
-                                    <input type="text" class="form-control" name="entry_fee[]"
-                                           value="{{ old('entry_fee.' . $index, $landmarkForRoutePoint->įėjimo_mokestis ?? '') }}">
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="type[]">Tipas</label>
-                                    <select class="form-control" name="type[]">
-                                        <option value="SPA centras" {{ old('type.' . $index, $landmarkForRoutePoint->tipas ?? '') == 'SPA centras' ? 'selected' : '' }}>SPA centras</option>
-                                        <option value="parkas" {{ old('type.' . $index, $landmarkForRoutePoint->tipas ?? '') == 'parkas' ? 'selected' : '' }}>Parkas</option>
-                                        <option value="baseinas" {{ old('type.' . $index, $landmarkForRoutePoint->tipas ?? '') == 'baseinas' ? 'selected' : '' }}>Baseinas</option>
-                                        <option value="restoranas" {{ old('type.' . $index, $landmarkForRoutePoint->tipas ?? '') == 'restoranas' ? 'selected' : '' }}>Restoranas</option>
-                                        <option value="kurortas" {{ old('type.' . $index, $landmarkForRoutePoint->tipas ?? '') == 'kurortas' ? 'selected' : '' }}>Kurortas</option>
-                                        <option value="pramogų centras" {{ old('type.' . $index, $landmarkForRoutePoint->tipas ?? '') == 'pramogų centras' ? 'selected' : '' }}>Pramogų centras</option>
-                                        <option value="muziejus" {{ old('type.' . $index, $landmarkForRoutePoint->tipas ?? '') == 'muziejus' ? 'selected' : '' }}>Muziejus</option>
-                                    </select>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="rating[]">Reitingas</label>
-                                    <input type="number" class="form-control" name="rating[]" step="0.1" max="5"
-                                           value="{{ old('rating.' . $index, $landmarkForRoutePoint->reitingas ?? '') }}">
-                                </div>
-                            </div>
+                        <div class="form-group mb-2">
+                            <label>Valstybė</label>
+                            <input type="text" name="country[]" class="form-control" value="{{ $point->valstybė }}">
+                        </div>
 
-                            <div class="col-md-12 text-end">
-                                <button type="button" class="btn btn-danger remove-row">Šalinti</button>
-                                @if(isset($routePoint->id))
-                                    <div class="form-check mt-2">
-                                        <input class="form-check-input" type="checkbox" name="delete_route_points[]" value="{{ $routePoint->id }}" id="delete_route_point_{{ $routePoint->id }}">
-                                        <label class="form-check-label" for="delete_route_point_{{ $routePoint->id }}">
-                                            Pažymėti pašalinimui
-                                        </label>
-                                    </div>
-                                @endif
-                            </div>
+                        <div class="form-group mb-2">
+                            <label>Miestas</label>
+                            <input type="text" name="city[]" class="form-control" value="{{ $point->miestas }}">
                         </div>
-                    @endforeach
-                @else
-                    <div class="row align-items-end mb-3 dynamic-row">
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label for="country[]">Valstybė</label>
-                                <input type="text" class="form-control" name="country[]" value="">
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="city[]">Miestas</label>
-                                <input type="text" class="form-control" name="city[]" value="">
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="name[]">Pavadinimas</label>
-                                <input type="text" class="form-control" name="name[]" value="">
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="address[]">Adresas</label>
-                                <input type="text" class="form-control" name="address[]" value="">
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="route_duration[]">Trukmė (valandos)</label>
-                                <input type="number" class="form-control" name="route_duration[]" value="">
-                            </div>
+
+                        <div class="form-group mb-2">
+                            <label>Pavadinimas</label>
+                            <input type="text" name="name[]" class="form-control" value="{{ $point->pavadinimas }}">
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label for="working_hours[]">Darbo Laikas</label>
-                                <input type="text" class="form-control" name="working_hours[]" value="">
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="entry_fee[]">Įėjimo Mokestis</label>
-                                <input type="text" class="form-control" name="entry_fee[]" value="">
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="type[]">Tipas</label>
-                                <select class="form-control" name="type[]">
-                                    <option value="SPA centras">SPA centras</option>
-                                    <option value="parkas">Parkas</option>
-                                    <option value="baseinas">Baseinas</option>
-                                    <option value="restoranas">Restoranas</option>
-                                    <option value="kurortas">Kurortas</option>
-                                    <option value="pramogų centras">Pramogų centras</option>
-                                    <option value="muziejus">Muziejus</option>
-                                </select>
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="rating[]">Reitingas</label>
-                                <input type="number" class="form-control" name="rating[]" step="0.1" max="5" value="">
-                            </div>
+
+                        <div class="form-group mb-2">
+                            <label>Adresas</label>
+                            <input type="text" name="address[]" class="form-control" value="{{ $point->adresas }}">
                         </div>
-                        <div class="col-md-12 text-end">
-                            <button type="button" class="btn btn-danger remove-row">Šalinti</button>
+
+                        <div class="form-group mb-2">
+                            <label>Trukmė (min.)</label>
+                            <input type="number" name="route_duration[]" class="form-control" value="{{ $point->trukmė }}">
                         </div>
+
+                        <div class="form-group mb-2">
+                            <label>Darbo laikas</label>
+                            <input type="text" name="working_hours[]" class="form-control" value="{{ $landmarks[$index]->darbo_laikas ?? '' }}">
+                        </div>
+
+                        <div class="form-group mb-2">
+                            <label>Įėjimo mokestis</label>
+                            <input type="number" step="0.01" name="entry_fee[]" class="form-control" value="{{ $landmarks[$index]->įėjimo_mokestis ?? '' }}">
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="type[]">Tipas</label>
+                            <select class="form-control" name="type[]">
+                                <option value="SPA centras">SPA centras</option>
+                                <option value="parkas">Parkas</option>
+                                <option value="baseinas">Baseinas</option>
+                                <option value="restoranas">Restoranas</option>
+                                <option value="kurortas">Kurortas</option>
+                                <option value="pramogų centras">Pramogų centras</option>
+                                <option value="muziejus">Muziejus</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-2">
+                            <label>Reitingas</label>
+                            <input type="number" name="rating[]" class="form-control" min="0" max="5" value="{{ $landmarks[$index]->reitingas ?? '' }}">
+                        </div>
+
+                        <div class="form-check mb-2">
+                            <input type="checkbox" name="delete_route_points[]" class="form-check-input" value="{{ $point->id }}">
+                            <label class="form-check-label">Pašalinti šį tašką</label>
+                        </div>
+
+                        <button type="button" class="btn btn-danger btn-sm remove-row">Pažymėti šalinimui</button>
                     </div>
-                @endif
+                @endforeach
             </div>
 
             <div class="text-end mb-3">
@@ -211,87 +138,43 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const dynamicRowsContainer = document.getElementById('dynamic-rows');
+            const addRowButton = document.getElementById('add-row');
 
-            document.getElementById('add-row').addEventListener('click', function () {
-                const firstRow = dynamicRowsContainer.querySelector('.dynamic-row');
-                if (firstRow) {
-                    const newRow = firstRow.cloneNode(true);
-                    Array.from(newRow.querySelectorAll('input[type="text"], input[type="number"]')).forEach(input => input.value = '');
-                    Array.from(newRow.querySelectorAll('select')).forEach(select => select.selectedIndex = 0);
-                    const deleteCheckbox = newRow.querySelector('input[name="delete_route_points[]"]');
-                    if (deleteCheckbox) {
-                        deleteCheckbox.remove();
-                        const labelToRemove = newRow.querySelector('label[for^="delete_route_point_"]');
-                        if (labelToRemove) {
-                            labelToRemove.remove();
-                        }
+            addRowButton.addEventListener('click', function () {
+                const rows = dynamicRowsContainer.querySelectorAll('.dynamic-row');
+                if (rows.length === 0) return;
+
+                const lastRow = rows[rows.length - 1];
+                const newRow = lastRow.cloneNode(true);
+
+                // Reset all inputs inside the cloned row
+                newRow.querySelectorAll('input, select').forEach(input => {
+                    // Remove values
+                    if (input.name === 'route_point_id[]' || input.name === 'landmark_id[]') {
+                        input.remove(); // remove hidden identifiers
+                    } else if (input.type === 'checkbox') {
+                        input.checked = false;
+                    } else {
+                        input.value = '';
                     }
-                    dynamicRowsContainer.appendChild(newRow);
-                } else {
-                    const newRowHtml = `
-                        <div class="row align-items-end mb-3 dynamic-row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="country[]">Valstybė</label>
-                                    <input type="text" class="form-control" name="country[]" value="">
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="city[]">Miestas</label>
-                                    <input type="text" class="form-control" name="city[]" value="">
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="name[]">Pavadinimas</label>
-                                    <input type="text" class="form-control" name="name[]" value="">
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="address[]">Adresas</label>
-                                    <input type="text" class="form-control" name="address[]" value="">
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="route_duration[]">Trukmė (valandos)</label>
-                                    <input type="number" class="form-control" name="route_duration[]" value="">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="working_hours[]">Darbo Laikas</label>
-                                    <input type="text" class="form-control" name="working_hours[]" value="">
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="entry_fee[]">Įėjimo Mokestis</label>
-                                    <input type="text" class="form-control" name="entry_fee[]" value="">
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="type[]">Tipas</label>
-                                    <select class="form-control" name="type[]">
-                                        <option value="SPA centras">SPA centras</option>
-                                        <option value="parkas">Parkas</option>
-                                        <option value="baseinas">Baseinas</option>
-                                        <option value="restoranas">Restoranas</option>
-                                        <option value="kurortas">Kurortas</option>
-                                        <option value="pramogų centras">Pramogų centras</option>
-                                        <option value="muziejus">Muziejus</option>
-                                    </select>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="rating[]">Reitingas</label>
-                                    <input type="number" class="form-control" name="rating[]" step="0.1" max="5"
-                                    value="">
-                                </div>
-                            </div>
-                            <div class="col-md-12 text-end">
-                                <button type="button" class="btn btn-danger remove-row">Šalinti</button>
-                            </div>
-                        </div>
-                    `;
-                    dynamicRowsContainer.insertAdjacentHTML('beforeend', newRowHtml);
-                }
+                });
+
+                // Reset row style
+                newRow.style.opacity = '1';
+
+                dynamicRowsContainer.appendChild(newRow);
             });
 
             dynamicRowsContainer.addEventListener('click', function (event) {
                 if (event.target.classList.contains('remove-row')) {
-                    if (document.querySelectorAll('.dynamic-row').length > 1) {
-                        event.target.closest('.dynamic-row').remove();
+                    const row = event.target.closest('.dynamic-row');
+                    const deleteCheckbox = row.querySelector('input[name="delete_route_points[]"]');
+                    if (deleteCheckbox) {
+                        deleteCheckbox.checked = true;
+                        row.style.opacity = 0.5;
+                    } else {
+                        // For newly added rows
+                        row.remove();
                     }
                 }
             });
