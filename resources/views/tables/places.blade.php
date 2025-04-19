@@ -1,9 +1,5 @@
 @extends('layouts/layout')
 
-@php
-    debug($places);
-@endphp
-
 @section('body')
     <div class="container py-5">
         <div class="d-flex justify-content-end align-items-center mb-4">
@@ -14,8 +10,8 @@
             <thead>
             <tr>
                 <th>Eilės numeris</th>
-                <th>Pradžia</th>
-                <th>Pabaiga</th>
+                <th>Užsakymo suformavimo data</th>
+                <th>Užsakymo nutraukimo data</th>
                 <th>Trukmė</th>
                 <th>Žmonių skaičius</th>
                 <th>Kelionės pradžia</th>
