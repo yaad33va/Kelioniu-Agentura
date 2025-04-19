@@ -1,4 +1,9 @@
 @extends('layouts/layout')
+
+@php
+    debug($places);
+@endphp
+
 @section('body')
     <div class="container py-5">
         <div class="d-flex justify-content-end align-items-center mb-4">
