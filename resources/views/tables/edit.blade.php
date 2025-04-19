@@ -85,7 +85,7 @@
                         </div>
 
                         <div class="form-group mb-2">
-                            <label>Trukmė (min.)</label>
+                            <label>Kelionės rukmė</label>
                             <input type="number" name="route_duration[]" class="form-control" value="{{ $point->trukmė }}">
                         </div>
 
