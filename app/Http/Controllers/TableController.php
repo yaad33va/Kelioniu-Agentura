@@ -331,4 +331,90 @@ class TableController extends Controller
 
         return redirect()->route('places')->with('error', 'Įrašo nepavyko rasti.');
     }
+
+    public function createPlace(Request $request)
+    {
+        // Validate the input
+        $validatedData = $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'duration' => 'required|integer|min:1',
+            'people_count' => 'required|integer|min:1',
+            'trip_status' => 'required|string|max:255',
+            'trip_start_date' => 'required|date',
+            'trip_end_date' => 'nullable|date|after_or_equal:trip_start_date',
+            'country.*' => 'nullable|string|max:255',
+            'city.*' => 'nullable|string|max:255',
+            'name.*' => 'nullable|string|max:255',
+            'address.*' => 'nullable|string|max:255',
+            'route_duration.*' => 'nullable|integer|min:1',
+            'working_hours.*' => 'nullable|string|max:255',
+            'entry_fee.*' => 'nullable|numeric|min:0',
+            'type.*' => 'nullable|string|max:255',
+            'rating.*' => 'nullable|integer|min:0|max:5',
+        ]);
+
+        // Insert a new trip into the `kelionės` table
+        DB::insert("
+        INSERT INTO kelionės (būsena, pradžia, pabaiga)
+        VALUES (?, ?, ?)
+    ", [
+            $validatedData['trip_status'],
+            $validatedData['trip_start_date'],
+            $validatedData['trip_end_date'],
+        ]);
+
+        // Get the last inserted trip ID
+        $tripId = DB::getPdo()->lastInsertId();
+
+        // Insert a new order into the `užsakymai` table
+        DB::insert("
+        INSERT INTO užsakymai (pasirašymo_data, nutraukimo_data, trukmė, žmonių_sk, fk_KELIONĖ)
+        VALUES (?, ?, ?, ?, ?)
+    ", [
+            $validatedData['start_date'],
+            $validatedData['end_date'],
+            $validatedData['duration'],
+            $validatedData['people_count'],
+            $tripId,
+        ]);
+
+        // Handle Maršruto taškai (route points) and Lankytinos vietos (landmarks)
+        if (is_array($request->input('country'))) {
+            foreach ($request->input('country') as $index => $country) {
+                // Insert a new route point into the `maršruto_taškai` table
+                DB::insert("
+                INSERT INTO maršruto_taškai (fk_KELIONĖ, valstybė, miestas, pavadinimas, adresas, trukmė)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ", [
+                    $tripId,
+                    $validatedData['country'][$index] ?? null,
+                    $validatedData['city'][$index] ?? null,
+                    $validatedData['name'][$index] ?? null,
+                    $validatedData['address'][$index] ?? null,
+                    $validatedData['route_duration'][$index] ?? null,
+                ]);
+
+                // Get the last inserted route point ID
+                $routePointId = DB::getPdo()->lastInsertId();
+
+                // Insert a new landmark into the `lankytinos_vietos` table
+                DB::insert("
+                INSERT INTO lankytinos_vietos (fk_MARŠRUTO_TAŠKAS, darbo_laikas, įėjimo_mokestis, tipas, reitingas)
+                VALUES (?, ?, ?, ?, ?)
+            ", [
+                    $routePointId,
+                    $validatedData['working_hours'][$index] ?? null,
+                    $validatedData['entry_fee'][$index] ?? null,
+                    $validatedData['type'][$index] ?? null,
+                    $validatedData['rating'][$index] ?? null,
+                ]);
+            }
+        }
+
+        return redirect()->route('places')->with('success', 'Naujas įrašas sėkmingai sukurtas.');
+    }
+    public function showCreatePlace(Request $request){
+        return view('tables.newEntry');
+    }
 }

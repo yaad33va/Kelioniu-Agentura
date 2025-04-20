@@ -48,6 +48,10 @@
             @endforeach
             </tbody>
         </table>
+        <!-- New button "Pridėti naują įrašą" -->
+        <div class="d-flex justify-content-end mt-4">
+            <a href="{{ route('places.createPlace') }}" class="btn btn-success">Pridėti naują įrašą</a>
+        </div>
         <div class="d-flex justify-content-end">
             <a href="{{ route('home') }}" class="btn btn-outline-primary">Grįžti</a>
         </div>

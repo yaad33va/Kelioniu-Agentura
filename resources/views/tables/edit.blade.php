@@ -140,28 +140,75 @@
             const dynamicRowsContainer = document.getElementById('dynamic-rows');
             const addRowButton = document.getElementById('add-row');
 
+            const createNewRow = () => {
+                const newRow = document.createElement('div');
+                newRow.classList.add('dynamic-row', 'border', 'rounded', 'p-3', 'mb-3');
+                newRow.innerHTML = `
+                <div class="form-group mb-2">
+                    <label>Valstybė</label>
+                    <input type="text" name="country[]" class="form-control">
+                </div>
+
+                <div class="form-group mb-2">
+                    <label>Miestas</label>
+                    <input type="text" name="city[]" class="form-control">
+                </div>
+
+                <div class="form-group mb-2">
+                    <label>Pavadinimas</label>
+                    <input type="text" name="name[]" class="form-control">
+                </div>
+
+                <div class="form-group mb-2">
+                    <label>Adresas</label>
+                    <input type="text" name="address[]" class="form-control">
+                </div>
+
+                <div class="form-group mb-2">
+                    <label>Kelionės trukmė</label>
+                    <input type="number" name="route_duration[]" class="form-control">
+                </div>
+
+                <div class="form-group mb-2">
+                    <label>Darbo laikas</label>
+                    <input type="text" name="working_hours[]" class="form-control">
+                </div>
+
+                <div class="form-group mb-2">
+                    <label>Įėjimo mokestis</label>
+                    <input type="number" step="0.01" name="entry_fee[]" class="form-control">
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="type[]">Tipas</label>
+                    <select class="form-control" name="type[]">
+                        <option value="SPA centras">SPA centras</option>
+                        <option value="parkas">Parkas</option>
+                        <option value="baseinas">Baseinas</option>
+                        <option value="restoranas">Restoranas</option>
+                        <option value="kurortas">Kurortas</option>
+                        <option value="pramogų centras">Pramogų centras</option>
+                        <option value="muziejus">Muziejus</option>
+                    </select>
+                </div>
+
+                <div class="form-group mb-2">
+                    <label>Reitingas</label>
+                    <input type="number" name="rating[]" class="form-control" min="0" max="5">
+                </div>
+
+                <div class="form-check mb-2">
+                    <input type="checkbox" name="delete_route_points[]" class="form-check-input">
+                    <label class="form-check-label">Pašalinti šį tašką</label>
+                </div>
+
+                <button type="button" class="btn btn-danger btn-sm remove-row">Pažymėti šalinimui</button>
+            `;
+                return newRow;
+            };
+
             addRowButton.addEventListener('click', function () {
-                const rows = dynamicRowsContainer.querySelectorAll('.dynamic-row');
-                if (rows.length === 0) return;
-
-                const lastRow = rows[rows.length - 1];
-                const newRow = lastRow.cloneNode(true);
-
-                // Reset all inputs inside the cloned row
-                newRow.querySelectorAll('input, select').forEach(input => {
-                    // Remove values
-                    if (input.name === 'route_point_id[]' || input.name === 'landmark_id[]') {
-                        input.remove(); // remove hidden identifiers
-                    } else if (input.type === 'checkbox') {
-                        input.checked = false;
-                    } else {
-                        input.value = '';
-                    }
-                });
-
-                // Reset row style
-                newRow.style.opacity = '1';
-
+                const newRow = createNewRow();
                 dynamicRowsContainer.appendChild(newRow);
             });
 
@@ -180,4 +227,5 @@
             });
         });
     </script>
+
 @endsection
