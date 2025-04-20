@@ -1,0 +1,165 @@
+@extends('layouts/layout')
+
+@section('body')
+    <div class="container py-5">
+        <div class="d-flex justify-content-end align-items-center mb-4">
+            <a href="{{ route('places') }}" class="btn btn-outline-primary">Grįžti į sąrašą</a>
+        </div>
+
+        <form action="{{ route('places.createPlace') }}" method="POST">
+            @csrf
+            @method('POST')
+
+            <!-- Main form fields -->
+            <div class="form-group mb-3">
+                <label for="start_date">Pasirašymo data</label>
+                <input type="date" class="form-control" id="start_date" name="start_date"
+                       value="" required>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="end_date">Nutraukimo data</label>
+                <input type="date" class="form-control" id="end_date" name="end_date"
+                       value="" required>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="duration">Trukmė (dienos)</label>
+                <input type="number" class="form-control" id="duration" name="duration"
+                       value="" required>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="people_count">Žmonių Skaičius</label>
+                <input type="number" class="form-control" id="people_count" name="people_count"
+                       value="" required>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="trip_start_date">Kelionės pradžia</label>
+                <input type="date" class="form-control" id="trip_start_date" name="trip_start_date"
+                       value="" required>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="trip_end_date">Kelionės pabaiga</label>
+                <input type="date" class="form-control" id="trip_end_date" name="trip_end_date"
+                       value="" required>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="trip_status">Būsena</label>
+                <select class="form-control" id="trip_status" name="trip_status" required>
+                    <option value="vykdoma">Vykdoma</option>
+                    <option value="planuojama" selected>Planuojama</option>
+                    <option value="baigta">Baigta</option>
+                </select>
+            </div>
+
+            <h3 class="mt-4">Maršruto Taškai ir Lankytinos Vietos</h3>
+            <div id="dynamic-rows">
+
+            </div>
+
+            <div class="text-end mb-3">
+                <button type="button" id="add-row" class="btn btn-success">Pridėti naują</button>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-4">Išsaugoti</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dynamicRowsContainer = document.getElementById('dynamic-rows');
+            const addRowButton = document.getElementById('add-row');
+
+            const createNewRow = () => {
+                const newRow = document.createElement('div');
+                newRow.classList.add('dynamic-row', 'border', 'rounded', 'p-3', 'mb-3');
+                newRow.innerHTML = `
+                <div class="form-group mb-2">
+                    <label>Valstybė</label>
+                    <input type="text" name="country[]" class="form-control">
+                </div>
+
+                <div class="form-group mb-2">
+                    <label>Miestas</label>
+                    <input type="text" name="city[]" class="form-control">
+                </div>
+
+                <div class="form-group mb-2">
+                    <label>Pavadinimas</label>
+                    <input type="text" name="name[]" class="form-control">
+                </div>
+
+                <div class="form-group mb-2">
+                    <label>Adresas</label>
+                    <input type="text" name="address[]" class="form-control">
+                </div>
+
+                <div class="form-group mb-2">
+                    <label>Kelionės trukmė</label>
+                    <input type="number" name="route_duration[]" class="form-control">
+                </div>
+
+                <div class="form-group mb-2">
+                    <label>Darbo laikas</label>
+                    <input type="text" name="working_hours[]" class="form-control">
+                </div>
+
+                <div class="form-group mb-2">
+                    <label>Įėjimo mokestis</label>
+                    <input type="number" step="0.01" name="entry_fee[]" class="form-control">
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="type[]">Tipas</label>
+                    <select class="form-control" name="type[]">
+                        <option value="SPA centras">SPA centras</option>
+                        <option value="parkas">Parkas</option>
+                        <option value="baseinas">Baseinas</option>
+                        <option value="restoranas">Restoranas</option>
+                        <option value="kurortas">Kurortas</option>
+                        <option value="pramogų centras">Pramogų centras</option>
+                        <option value="muziejus">Muziejus</option>
+                    </select>
+                </div>
+
+                <div class="form-group mb-2">
+                    <label>Reitingas</label>
+                    <input type="number" name="rating[]" class="form-control" min="0" max="5">
+                </div>
+
+                <div class="form-check mb-2">
+                    <input type="checkbox" name="delete_route_points[]" class="form-check-input">
+                    <label class="form-check-label">Pašalinti šį tašką</label>
+                </div>
+
+                <button type="button" class="btn btn-danger btn-sm remove-row">Pažymėti šalinimui</button>
+            `;
+                return newRow;
+            };
+
+            addRowButton.addEventListener('click', function () {
+                const newRow = createNewRow();
+                dynamicRowsContainer.appendChild(newRow);
+            });
+
+            dynamicRowsContainer.addEventListener('click', function (event) {
+                if (event.target.classList.contains('remove-row')) {
+                    const row = event.target.closest('.dynamic-row');
+                    const deleteCheckbox = row.querySelector('input[name="delete_route_points[]"]');
+                    if (deleteCheckbox) {
+                        deleteCheckbox.checked = true;
+                        row.style.opacity = 0.5;
+                    } else {
+                        // For newly added rows
+                        row.remove();
+                    }
+                }
+            });
+        });
+    </script>
+
+@endsection
