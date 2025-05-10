@@ -20,10 +20,8 @@
                         <tr>
                             @foreach((array) $record as $key => $value)
                                 @php
-                                    // Default formatting
                                     $formatted = $value;
 
-                                    // Custom formatting for 'tipas'
                                     if (strtolower($key) === 'tipas') {
                                         $formatted = str_replace('_', ' ', $formatted);
                                         $formatted = ucfirst($formatted);

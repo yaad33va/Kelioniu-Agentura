@@ -10,7 +10,6 @@
             @csrf
             @method('POST')
 
-            <!-- Main form fields -->
             <div class="form-group mb-3">
                 <label for="start_date">Pasirašymo data</label>
                 <input type="date" class="form-control" id="start_date" name="start_date"
@@ -154,7 +153,6 @@
                         deleteCheckbox.checked = true;
                         row.style.opacity = 0.5;
                     } else {
-                        // For newly added rows
                         row.remove();
                     }
                 }

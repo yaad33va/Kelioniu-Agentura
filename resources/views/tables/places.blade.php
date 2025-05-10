@@ -17,14 +17,14 @@
                 <th>Kelionės pradžia</th>
                 <th>Kelionės pabaiga</th>
                 <th>Būsena</th>
-                <th>Redaguoti</th> <!-- New column for edit button -->
-                <th>Veiksmai</th> <!-- Column for delete button -->
+                <th>Redaguoti</th>
+                <th>Veiksmai</th>
             </tr>
             </thead>
             <tbody>
             @foreach($places as $place)
                 <tr>
-                    <td>{{ $loop->iteration }}</td> <!-- Use $loop->iteration for row numbers -->
+                    <td>{{ $loop->iteration }}</td>
                     <td>{{ $place->start_date }}</td>
                     <td>{{ $place->end_date }}</td>
                     <td>{{ $place->duration ?? 'N/A' }}</td>
@@ -33,11 +33,9 @@
                     <td>{{ $place->trip_end_date }}</td>
                     <td>{{ $place->status }}</td>
                     <td>
-                        <!-- Edit button -->
                         <a href="{{ route('places.edit', $place->record_id) }}" class="btn btn-primary btn-sm">Redaguoti įrašą</a>
                     </td>
                     <td>
-                        <!-- Delete button form -->
                         <form action="{{ route('places.destroy', $place->record_id) }}" method="POST" onsubmit="return confirm('Ar tikrai norite ištrinti šį įrašą?');">
                             @csrf
                             @method('DELETE')
@@ -48,7 +46,6 @@
             @endforeach
             </tbody>
         </table>
-        <!-- New button "Pridėti naują įrašą" -->
         <div class="d-flex justify-content-end mt-4">
             <a href="{{ route('places.createPlace') }}" class="btn btn-success">Pridėti naują įrašą</a>
         </div>

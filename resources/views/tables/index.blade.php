@@ -26,7 +26,6 @@
                         {{ ucfirst(str_replace('_', ' ', $tableName)) }}
                     </a>
                 @endforeach
-                <!-- NEW NAV BUTTON -->
                 <a href="{{ route('places') }}">Maršrutai</a>
             </div>
         </div>

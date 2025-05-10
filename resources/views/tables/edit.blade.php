@@ -11,7 +11,6 @@
             @csrf
             @method('PUT')
 
-            <!-- Main form fields -->
             <div class="form-group mb-3">
                 <label for="start_date">Pasirašymo data</label>
                 <input type="date" class="form-control" id="start_date" name="start_date"
