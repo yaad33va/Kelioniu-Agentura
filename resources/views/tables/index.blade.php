@@ -27,6 +27,7 @@
                     </a>
                 @endforeach
                 <a href="{{ route('places') }}">Maršrutai</a>
+                <a href="{{ route('filters') }}">Ataskaitos</a>
             </div>
         </div>
     </div>

@@ -16,3 +16,5 @@ Route::put('places/{id}/edit', [TableController::class, 'update'])->name('places
 Route::get('/places/{id}/edit', [TableController::class, 'edit'])->name('places.edit');
 Route::put('/places/{id}', [TableController::class, 'update'])->name('places.update');
 Route::delete('/places/{id}', [TableController::class, 'destroy'])->name('places.destroy');
+Route::get('/filters', [TableController::class, 'filters'])->name('filters');
+Route::post('/aggregates', [TableController::class, 'aggregates'])->name('aggregates');

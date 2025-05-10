@@ -1,7 +1,10 @@
 <?php
+
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class TableController extends Controller
@@ -75,6 +78,7 @@ class TableController extends Controller
             'headers' => $headers,
         ]);
     }
+
     //Sujungiamos lenteles uzsakymai ir keliones
     public function places()
     {
@@ -95,6 +99,7 @@ class TableController extends Controller
 
         return view('tables.places', ['places' => $places]);
     }
+
     public function edit($id)
     {
         //Vienas uzsakymas keliones
@@ -390,7 +395,93 @@ class TableController extends Controller
 
         return redirect()->route('places');
     }
-    public function showCreatePlace(Request $request){
+
+    public function showCreatePlace(Request $request)
+    {
         return view('tables.newEntry');
+    }
+
+    public function filters(Request $request)
+    {
+        return view('tables.filters');
+    }
+
+    public function aggregates(Request $request)
+    {
+        $filters = $request->except('_token');
+
+        $baseSql = "
+            SELECT
+                CONCAT(k.vardas, ' ', k.pavardė) AS PersonName,
+                u.užsakymo_numeris AS OrderID,
+                u.pasirašymo_data AS BeginOrderDate,
+                u.nutraukimo_data AS EndOrderDate,
+                COALESCE(COUNT(DISTINCT u.užsakymo_numeris), 0) AS OrderCount,
+                SUM(IF(m.suma >= 0, m.suma, 0)) AS OrderPaymentSum,
+                ROUND(COALESCE(AVG(m.suma), 0), 1) AS AverageOrderPayment,
+                COALESCE(MAX(s.suma), 0) AS MaxOrderBillSum
+            FROM
+                klientai k
+            LEFT JOIN
+                užsakymai u ON u.fk_KLIENTAS = k.asmens_kodas
+            LEFT JOIN
+                sąskaitos s ON s.fk_UŽSAKYMAS = u.užsakymo_numeris
+            LEFT JOIN
+                mokėjimai m ON m.fk_SĄSKAITA = s.numeris
+            :where_clause:
+            GROUP BY
+                PersonName,
+                OrderID ASC,
+                BeginOrderDate,
+                EndOrderDate
+            WITH ROLLUP;
+        ";
+
+        $whereClauses = [];
+        $bindings = [];
+
+        if (isset($filters['beginDate']))
+        {
+            $whereClauses[] = "u.pasirašymo_data >= ?";
+            $bindings[] = $filters['beginDate'];
+        }
+
+        if (isset($filters['endDate']))
+        {
+            $whereClauses[] = "u.pasirašymo_data < ?";
+            $bindings[] = Carbon::make($filters['endDate'])->addDay()->toDateTimeString();
+        }
+
+        if (isset($filters['beginEndDate']))
+        {
+            $whereClauses[] = "u.nutraukimo_data >= ?";
+            $bindings[] = $filters['beginDate'];
+        }
+
+        if (isset($filters['endEndDate']))
+        {
+            $whereClauses[] = "u.nutraukimo_data < ?";
+            $bindings[] = Carbon::make($filters['endEndDate'])->addDay()->toDateTimeString();
+        }
+
+        if (isset($filters['maxSum']))
+        {
+            $whereClauses[] = "s.suma <= ?";
+            $bindings[] = $filters['maxSum'];
+        }
+
+        $whereSql = "";
+
+        if (!empty($whereClauses)) {
+            $whereSql = "WHERE " . implode(" AND ", $whereClauses);
+        }
+
+        $finalSql = str_replace(':where_clause:', $whereSql, $baseSql);
+
+        $aggregatedData = DB::select($finalSql, $bindings);
+
+        return view('tables.aggregates', [
+            'aggregatedData' => Collection::make($aggregatedData)->groupBy(['PersonName', 'OrderID'])
+        ]);
     }
 }
