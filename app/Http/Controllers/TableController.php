@@ -419,7 +419,7 @@ class TableController extends Controller
                 COALESCE(COUNT(DISTINCT u.užsakymo_numeris), 0) AS OrderCount,
                 SUM(IF(m.suma >= 0, m.suma, 0)) AS OrderPaymentSum,
                 ROUND(COALESCE(AVG(m.suma), 0), 1) AS AverageOrderPayment,
-                COALESCE(MAX(s.suma), 0) AS MaxOrderBillSum
+                COALESCE(MAX(s.suma), 0) AS MaxOrderBillSum //jei max yra null, tada grazins 0
             FROM
                 klientai k
             LEFT JOIN

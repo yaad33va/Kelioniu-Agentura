@@ -5,9 +5,9 @@
 @section('body')
     <div class="container py-5">
         <div class="d-flex justify-content-end align-items-center mb-4">
-            <a href="{{ route('filters') }}" class="btn btn-outline-primary">Grįžti ataskaitos formavima</a>
+            <a href="{{ route('filters') }}" class="btn btn-outline-primary">Grįžti į ataskaitos formavimą</a>
         </div>
-
+        @if($aggregatedData->isNotEmpty())
         @foreach($aggregatedData as $user => $data)
             @if($user !== "")
             <div class="table-responsive">
@@ -20,7 +20,7 @@
                                 <th>Nutraukimo data</th>
                                 <th>Vidutinis mokėjimas</th>
                                 <th>Maksimalus mokėjimas</th>
-                                <th>Mokejimų suma</th>
+                                <th>Mokėjimų suma</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -56,7 +56,7 @@
                         <th class="text-white h-0 p-0 border-0 leading-none overflow-hidden">Nutraukimo data</th>
                         <th class="text-white h-0 p-0 border-0 leading-none overflow-hidden">Vidutinis mokėjimas</th>
                         <th class="text-white h-0 p-0 border-0 leading-none overflow-hidden">Maksimalus mokėjimas</th>
-                        <th class="text-white h-0 p-0 border-0 leading-none overflow-hidden">Mokejimų suma</th>
+                        <th class="text-white h-0 p-0 border-0 leading-none overflow-hidden">Mokėjimų suma</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -67,5 +67,10 @@
                 </tbody>
             </table>
         </div>
+            @else
+            <h1>
+                Tokių duomenų nėra.
+            </h1>
+        @endif
     </div>
 @endsection

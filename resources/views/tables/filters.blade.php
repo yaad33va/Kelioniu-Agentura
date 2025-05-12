@@ -25,7 +25,7 @@
                 <label for="endEndDate">Iki</label>
                 <input type="date" class="form-control" id="endEndDate" name="endEndDate">
             </div>
-            <h4 class="mt-4">Užsakymo numeris</h4>
+            <h4 class="mt-4">Sąskaitos suma</h4>
             <div class="form-group">
                 <label for="maxSum">Didžiausia sąskaitos suma</label>
                 <input type="number" class="form-control" id="maxSum" name="maxSum">
